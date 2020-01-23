@@ -1,0 +1,8 @@
+.Graph {
+    display: inline-block;
+    border: 1px solid rgba(0, 0, 0, 0.20);
+    margin: 5px;
+    box-sizing: border-box;
+    width: 70%;
+    height: 100%;
+}
