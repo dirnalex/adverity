@@ -11,7 +11,10 @@ export default class Adverity extends Component {
     render() {
         return (
             <div className="Adverity">
-                <Filter/>
+                <Filter heading={"Filter Dimension Values"}
+                        datasources={["DS1", "DS2"]} campains={["C1", "C2"]}
+                        onApply={(data) => {
+                        }}/>
                 <Graph/>
             </div>
         );
