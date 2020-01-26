@@ -2,12 +2,13 @@ import React, {useEffect, useState} from 'react';
 import Filter from './Filter.js';
 import MultiYAxisGraph from './MultiYAxisGraph.js';
 import './Adverity.css';
-import {Dimmer, Loader, Segment} from "semantic-ui-react";
+import {Dimmer, Header, Icon, Loader, Segment} from "semantic-ui-react";
 import moment from "moment";
 import 'semantic-ui-css/semantic.min.css';
 
-const inputDateFormat = "DD.MM.YYYY";
-const outputDateFormat = "MMM D YYYY";
+const INPUT_DATE_FORMAT = "DD.MM.YYYY";
+const OUTPUT_DATE_FORMAT = "MMM D YYYY";
+const DATA_URL = "http://adverity-challenge.s3-website-eu-west-1.amazonaws.com/DAMKBAoDBwoDBAkOBAYFCw.csv";
 
 const Adverity = () => {
     const [data, setData] = useState([]);
@@ -18,11 +19,10 @@ const Adverity = () => {
     const [filterString, setFilterString] = useState(composeFilterString([], []));
     const [dataToShow, setDataToShow] = useState([]);
     const [isDataLoading, setIsDataLoading] = useState(false);
-
     const [isDataLoadError, setIsDataLoadError] = useState(false);
     useEffect(() => {
         setIsDataLoading(true);
-        loadData()
+        loadData(DATA_URL)
             .then(([data, datasources, campaigns]) => {
                 setData(data);
                 setDataToShow(prepareDataToShow(data));
@@ -41,6 +41,12 @@ const Adverity = () => {
         <Segment basic className="Adverity">
             <Dimmer active={isDataLoading}>
                 <Loader>Loading data</Loader>
+            </Dimmer>
+            <Dimmer active={isDataLoadError}>
+                <Header as='h2' icon inverted>
+                    <Icon name='ban'/>
+                    Failed to load the data
+                </Header>
             </Dimmer>
             <div className="filter">
                 <Filter heading={"Filter Dimension Values"}
@@ -76,13 +82,13 @@ const Adverity = () => {
                                          dataKey: "date",
                                          type: "number",
                                          scale: "time",
-                                         formatter: (val) => moment(val).format(outputDateFormat)
+                                         formatter: (val) => moment(val).format(OUTPUT_DATE_FORMAT)
                                      }}
                                      yMetas={[
                                          {dataKey: "clicks", stroke: "#8884d8"},
                                          {dataKey: "impressions", orientation: "right", stroke: "#82ca9d"}
                                      ]}/> :
-                    <div>No data to show</div>
+                    <Segment basic><Header size='medium'>No data to show</Header></Segment>
                 }
             </div>
         </Segment>
@@ -128,8 +134,11 @@ const prepareDataToShow = data => {
     return dataToShowArr;
 
 };
-const loadData = async () => {
-    const response = await fetch("http://adverity-challenge.s3-website-eu-west-1.amazonaws.com/DAMKBAoDBwoDBAkOBAYFCw.csv");
+const loadData = async (dataUrl) => {
+    const response = await fetch(dataUrl);
+    if (!response.ok) {
+        throw new Error("Failed to load file")
+    }
     const csv = await response.text();
     const [header, ...lines] = csv.split("\n");
     const headerArr = header.split(",").map(headerItem => headerItem.toLowerCase());
@@ -157,7 +166,7 @@ const arrayToObjectReducer = (headerArr, object, value, index) => ({
 const parseValueWithType = (value, type) => {
     switch (type) {
         case "date":
-            return moment(value, inputDateFormat).valueOf();
+            return moment(value, INPUT_DATE_FORMAT).valueOf();
         case "clicks":
         case "impressions":
             return Number(value);
