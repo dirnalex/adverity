@@ -2,8 +2,9 @@ import React, {useEffect, useState} from 'react';
 import Filter from './Filter.js';
 import MultiYAxisGraph from './MultiYAxisGraph.js';
 import './Adverity.css';
-import {Dimmer, Header, Icon, Loader, Segment} from "semantic-ui-react";
-import moment from "moment";
+import {Dimmer, Header, Icon, Loader, Segment} from 'semantic-ui-react';
+import moment from 'moment';
+import memoizee from 'memoizee';
 import 'semantic-ui-css/semantic.min.css';
 
 const INPUT_DATE_FORMAT = "DD.MM.YYYY";
@@ -139,6 +140,12 @@ const loadData = async (dataUrl) => {
     if (!response.ok) {
         throw new Error("Failed to load file")
     }
+    //memoize to skip calculations for the same dataset
+    //Not working properly at the moment, need to add Access-Control-Allow-Origin to the server response.
+    return await memoizedDataRead(response.headers.get('ETag'), response);
+};
+
+const dataRead = async (hash, response) => {
     const csv = await response.text();
     const [header, ...lines] = csv.split("\n");
     const headerArr = header.split(",").map(headerItem => headerItem.toLowerCase());
@@ -153,8 +160,9 @@ const loadData = async (dataUrl) => {
             return lineObj;
         });
     return [parsedData, [...datasourceSet], [...campaignSet]];
-
 };
+
+const memoizedDataRead = memoizee(dataRead, {primitive: true, length: 1});
 
 const parseline = (line, headerArr) =>
     line.split(",").reduce(arrayToObjectReducer.bind(null, headerArr), {});
