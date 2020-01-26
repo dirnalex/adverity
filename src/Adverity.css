@@ -8,12 +8,27 @@
 }
 
 .Adverity .graph {
-    flex: 1 1 auto;
-
+    flex: 1 1 70%;
+    max-width: 70%;
 }
 
 .Adverity .graph, .Adverity .filter {
     margin: 5px;
     border-radius: 5px;
     border: lightgray 1px solid;
+}
+
+@media screen and (max-width: 768px) {
+    .Adverity {
+        flex-wrap: wrap;
+    }
+
+    .Adverity .filter {
+        flex: 1 1 100%;
+    }
+
+    .Adverity .graph {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
 }
