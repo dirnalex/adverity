@@ -1,4 +1,19 @@
 .Adverity {
-    height: 300px;
     display: flex;
+}
+
+.Adverity .filter {
+    flex: 0 0 30%;
+    background: aliceblue;
+}
+
+.Adverity .graph {
+    flex: 1 1 auto;
+
+}
+
+.Adverity .graph, .Adverity .filter {
+    margin: 5px;
+    border-radius: 5px;
+    border: lightgray 1px solid;
 }
