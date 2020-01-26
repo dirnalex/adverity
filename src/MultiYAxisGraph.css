@@ -1,0 +1,14 @@
+.Graph {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.Graph .heading {
+    flex: 0 1 auto;
+}
+
+.Graph .graph-box {
+    flex: 1 1 auto;
+}
